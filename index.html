@@ -8,7 +8,7 @@
     <style>
         :root {
             --bg-dark: #0a0e17;
-            --panel-bg: rgba(16, 23, 38, 0.75);
+            --panel-bg: rgba(16, 23, 38, 0.85);
             --panel-border: rgba(0, 180, 255, 0.25);
             --primary-blue: #00d2ff;
             --accent-cyan: #00f0ff;
@@ -18,6 +18,7 @@
             --danger: #ff4757;
             --danger-hover: #ff6b81;
             --success: #2ed573;
+            --warning: #ffa502;
             --glow: 0 0 20px rgba(0, 210, 255, 0.35);
         }
 
@@ -41,13 +42,17 @@
 
         .navbar {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 25px;
-            padding: 18px 20px;
+            padding: 15px 30px;
             background: rgba(8, 12, 22, 0.9);
             border-bottom: 1px solid var(--panel-border);
             backdrop-filter: blur(10px);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
         }
 
         .nav-item {
@@ -69,6 +74,24 @@
             text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
         }
 
+        .admin-toggle-btn {
+            background: rgba(255, 165, 2, 0.15);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-toggle-btn:hover {
+            background: var(--warning);
+            color: #000;
+            box-shadow: 0 0 15px rgba(255, 165, 2, 0.4);
+        }
+
         .container {
             max-width: 1000px;
             margin: 30px auto;
@@ -80,12 +103,6 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-        }
-
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
         }
 
         .sub-header {
@@ -149,6 +166,23 @@
             font-size: 0.75rem;
             padding: 1px 6px;
             border-radius: 3px;
+        }
+
+        .select-user-box {
+            margin: 10px auto 20px auto;
+            max-width: 320px;
+        }
+
+        .select-user-box select {
+            width: 100%;
+            padding: 10px 15px;
+            background: #0d1527;
+            border: 1px solid var(--primary-blue);
+            color: var(--text-light);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
         }
 
         .status-indicator {
@@ -236,7 +270,7 @@
         .section-title {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
             margin-bottom: 15px;
         }
 
@@ -256,6 +290,7 @@
             border-radius: 12px;
             overflow: hidden;
             backdrop-filter: blur(10px);
+            margin-bottom: 35px;
         }
 
         table {
@@ -292,6 +327,12 @@
             display: inline-block;
         }
 
+        .status-tag.off {
+            background: rgba(107, 130, 158, 0.15);
+            border-color: var(--text-muted);
+            color: var(--text-muted);
+        }
+
         .accumulated-time {
             font-family: 'Orbitron', sans-serif;
             color: var(--primary-blue);
@@ -304,41 +345,145 @@
             color: var(--text-muted);
         }
 
-        .user-info {
+        /* Admin Panel Styles */
+        .admin-panel {
+            background: rgba(20, 15, 30, 0.9);
+            border: 1px solid var(--warning);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 35px;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-header {
+            color: var(--warning);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-officer-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .add-officer-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            background: #0d1527;
+            border: 1px solid rgba(255, 165, 2, 0.4);
+            color: #fff;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .btn-add {
+            background: var(--warning);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
             cursor: pointer;
-            text-decoration: underline;
-            text-decoration-style: dashed;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            background: #ffb703;
+            box-shadow: 0 0 10px rgba(255, 165, 2, 0.5);
+        }
+
+        .btn-delete {
+            background: rgba(255, 71, 87, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="#" class="nav-item">🏠 หน้าหลัก</a>
-        <a href="#" class="nav-item">⚖️ กฎระเบียบ</a>
-        <a href="#" class="nav-item active">⏱️ เข้าเวร</a>
-        <a href="#" class="nav-item">📋 ลงเคส</a>
-        <a href="#" class="nav-item">📊 สถิติ</a>
+        <div class="nav-links">
+            <a href="#" class="nav-item">🏠 หน้าหลัก</a>
+            <a href="#" class="nav-item">⚖️ กฎระเบียบ</a>
+            <a href="#" class="nav-item active">⏱️ เข้าเวร</a>
+            <a href="#" class="nav-item">📋 ลงเคส</a>
+            <a href="#" class="nav-item">📊 สถิติ</a>
+        </div>
+        <button class="admin-toggle-btn" onclick="toggleAdminPanel()">⚙️ แผงควบคุม Admin</button>
     </nav>
 
     <div class="container">
         <div class="header-title">
-            <div class="brand-section">
-                <div>
-                    <div class="sub-header">LNWZA STORY</div>
-                    <div class="main-header">เข้าเวร</div>
-                </div>
+            <div>
+                <div class="sub-header">LNWZA STORY</div>
+                <div class="main-header">ระบบบันทึกเวลาปฏิบัติงาน</div>
             </div>
             <div class="time-today">
-                เวลางานวันนี้<br>
-                <span id="todayTotal">00:00</span> <small style="font-size: 0.7rem; color: var(--text-muted);">ชม.:นาที</small>
+                เวลางานสะสมของคุณ<br>
+                <span id="todayTotal">00:00:00</span>
             </div>
         </div>
 
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-header">⚙️ แผงจัดการผู้ดูแลระบบ (Admin Control Panel)</div>
+            
+            <div class="add-officer-form">
+                <input type="text" id="newOfficerName" placeholder="ชื่อเจ้าหน้าที่ (เช่น ร.ต.อ. สมชาย)" />
+                <input type="text" id="newOfficerRank" placeholder="ยศ / ตำแหน่ง (เช่น ผู้บังคับการ)" />
+                <button class="btn-add" onclick="addOfficer()">+ เพิ่มรายชื่อเจ้าหน้าที่</button>
+            </div>
+
+            <h4 style="margin-bottom: 10px; color: var(--text-muted);">รายชื่อเจ้าหน้าที่ทั้งหมดในระบบ (<span id="totalOfficersCount">0</span> คน)</h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ชื่อเจ้าหน้าที่</th>
+                            <th>ยศ / ตำแหน่ง</th>
+                            <th>สถานะ</th>
+                            <th>เวลารวมสะสม</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Duty Card -->
         <div class="duty-card">
             <div class="badge-step">
                 <span class="badge-num">01</span>
-                <span>สถานะของฉัน (<span class="user-info" id="currentUserName" onclick="changeName()">เจ้าหน้าที่ LNWZA</span>)</span>
+                <span>เลือกรายชื่อของท่านเพื่อเข้าเวร</span>
+            </div>
+
+            <div class="select-user-box">
+                <select id="userSelect" onchange="onSelectUser()">
+                    <option value="">-- เลือกรายชื่อเจ้าหน้าที่ --</option>
+                </select>
             </div>
 
             <div class="status-indicator" id="statusIndicator">
@@ -353,6 +498,7 @@
             </button>
         </div>
 
+        <!-- Active Officers Table -->
         <div class="section-title">
             <div class="badge-step" style="margin-bottom: 0;">
                 <span class="badge-num">02</span>
@@ -366,14 +512,15 @@
                 <thead>
                     <tr>
                         <th>ชื่อเจ้าหน้าที่</th>
+                        <th>ยศ / ตำแหน่ง</th>
                         <th>สถานะ</th>
                         <th>เริ่มเข้าเวรเมื่อ</th>
-                        <th>ระยะเวลาสะสม</th>
+                        <th>เวลาเข้าเวรรอบนี้</th>
                     </tr>
                 </thead>
                 <tbody id="officerTableBody">
                     <tr>
-                        <td colspan="4" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
+                        <td colspan="5" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
                     </tr>
                 </tbody>
             </table>
@@ -381,24 +528,17 @@
     </div>
 
     <script>
+        // Default initial data
+        let officers = JSON.parse(localStorage.getItem("lnwza_officers")) || [
+            { id: 1, name: "เจ้าหน้าที่ LNWZA", rank: "ผู้บังคับการ", totalSeconds: 0, isOnDuty: false, startTime: "" }
+        ];
+
+        let selectedOfficerId = null;
         let timer = null;
-        let seconds = 0;
-        let isOnDuty = false;
-        let startTimeStr = "--:--:--";
-        let userName = localStorage.getItem("lnwza_username") || "เจ้าหน้าที่ LNWZA";
+        let sessionSeconds = 0;
 
-        document.getElementById("currentUserName").innerText = userName;
-
-        function changeName() {
-            let newName = prompt("กรุณากรอกชื่อเจ้าหน้าที่ของคุณ:", userName);
-            if (newName && newName.trim() !== "") {
-                userName = newName.trim();
-                localStorage.setItem("lnwza_username", userName);
-                document.getElementById("currentUserName").innerText = userName;
-                if (isOnDuty) {
-                    renderTable();
-                }
-            }
+        function saveToStorage() {
+            localStorage.setItem("lnwza_officers", JSON.stringify(officers));
         }
 
         function formatTime(totalSeconds) {
@@ -413,16 +553,102 @@
             );
         }
 
+        function toggleAdminPanel() {
+            const panel = document.getElementById("adminPanel");
+            panel.classList.toggle("active");
+            renderAdminTable();
+        }
+
+        function populateSelect() {
+            const select = document.getElementById("userSelect");
+            select.innerHTML = '<option value="">-- เลือกรายชื่อเจ้าหน้าที่ --</option>';
+            officers.forEach(off => {
+                const opt = document.createElement("option");
+                opt.value = off.id;
+                opt.innerText = `${off.name} (${off.rank || 'เจ้าหน้าที่'})`;
+                if (off.id === selectedOfficerId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function onSelectUser() {
+            const val = document.getElementById("userSelect").value;
+            if (!val) {
+                selectedOfficerId = null;
+                return;
+            }
+            selectedOfficerId = parseInt(val);
+            const off = officers.find(o => o.id === selectedOfficerId);
+            if (off) {
+                document.getElementById("todayTotal").innerText = formatTime(off.totalSeconds);
+            }
+        }
+
+        function addOfficer() {
+            const nameInput = document.getElementById("newOfficerName");
+            const rankInput = document.getElementById("newOfficerRank");
+            const name = nameInput.value.trim();
+            const rank = rankInput.value.trim() || "เจ้าหน้าที่";
+
+            if (!name) {
+                alert("กรุณากรอกชื่อเจ้าหน้าที่");
+                return;
+            }
+
+            const newOff = {
+                id: Date.now(),
+                name: name,
+                rank: rank,
+                totalSeconds: 0,
+                isOnDuty: false,
+                startTime: ""
+            };
+
+            officers.push(newOff);
+            saveToStorage();
+            
+            nameInput.value = "";
+            rankInput.value = "";
+
+            populateSelect();
+            renderAdminTable();
+        }
+
+        function deleteOfficer(id) {
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายชื่อเจ้าแต้มนี้ออกจากระบบ?")) {
+                const off = officers.find(o => o.id === id);
+                if (off && off.isOnDuty) {
+                    alert("ไม่สามารถลบเจ้าหน้าที่ที่กำลังเข้าเวรอยู่ได้");
+                    return;
+                }
+                officers = officers.filter(o => o.id !== id);
+                if (selectedOfficerId === id) selectedOfficerId = null;
+                saveToStorage();
+                populateSelect();
+                renderAdminTable();
+                renderTable();
+            }
+        }
+
         function toggleDuty() {
+            if (!selectedOfficerId) {
+                alert("กรุณาเลือกรายชื่อเจ้าหน้าที่ก่อนกดเข้าเวร!");
+                return;
+            }
+
+            const off = officers.find(o => o.id === selectedOfficerId);
+            if (!off) return;
+
             const btn = document.getElementById("dutyBtn");
             const btnText = document.getElementById("btnText");
             const statusIndicator = document.getElementById("statusIndicator");
 
-            if (!isOnDuty) {
-                isOnDuty = true;
+            if (!off.isOnDuty) {
+                off.isOnDuty = true;
                 const now = new Date();
-                startTimeStr = now.toTimeString().split(' ')[0] + " น.";
-                
+                off.startTime = now.toTimeString().split(' ')[0] + " น.";
+                sessionSeconds = 0;
+
                 btn.className = "btn-duty btn-off";
                 btnText.innerText = "จบเวร / เลิกงาน";
                 
@@ -432,20 +658,18 @@
                 `;
 
                 timer = setInterval(() => {
-                    seconds++;
-                    document.getElementById("display").innerText = formatTime(seconds);
-                    let mins = Math.floor(seconds / 60);
-                    let hrs = Math.floor(mins / 60);
-                    let displayMins = mins % 60;
-                    document.getElementById("todayTotal").innerText = 
-                        (hrs < 10 ? "0" + hrs : hrs) + ":" + (displayMins < 10 ? "0" + displayMins : displayMins);
+                    sessionSeconds++;
+                    off.totalSeconds++;
+                    document.getElementById("display").innerText = formatTime(sessionSeconds);
+                    document.getElementById("todayTotal").innerText = formatTime(off.totalSeconds);
+                    saveToStorage();
                     renderTable();
                 }, 1000);
 
             } else {
-                isOnDuty = false;
+                off.isOnDuty = false;
                 clearInterval(timer);
-                seconds = 0;
+                sessionSeconds = 0;
                 document.getElementById("display").innerText = "00:00:00";
                 
                 btn.className = "btn-duty btn-on";
@@ -455,34 +679,68 @@
                     <span class="dot dot-off"></span>
                     <span class="status-off">OFF DUTY</span>
                 `;
+                saveToStorage();
             }
 
             renderTable();
+            renderAdminTable();
         }
 
         function renderTable() {
             const tbody = document.getElementById("officerTableBody");
             const badge = document.getElementById("onlineBadge");
 
-            if (isOnDuty) {
-                badge.innerText = "1 ONLINE";
-                tbody.innerHTML = `
+            const activeOfficers = officers.filter(o => o.isOnDuty);
+            badge.innerText = `${activeOfficers.length} ONLINE`;
+
+            if (activeOfficers.length > 0) {
+                tbody.innerHTML = activeOfficers.map(o => `
                     <tr>
-                        <td><strong>${userName}</strong></td>
+                        <td><strong>${o.name}</strong></td>
+                        <td>${o.rank}</td>
                         <td><span class="status-tag">ONLINE</span></td>
-                        <td>${startTimeStr}</td>
-                        <td class="accumulated-time">${formatTime(seconds)}</td>
+                        <td>${o.startTime}</td>
+                        <td class="accumulated-time">${formatTime(sessionSeconds)}</td>
                     </tr>
-                `;
+                `).join("");
             } else {
-                badge.innerText = "0 ONLINE";
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
+                        <td colspan="5" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
                     </tr>
                 `;
             }
         }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById("adminTableBody");
+            document.getElementById("totalOfficersCount").innerText = officers.length;
+
+            if (officers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-table">ไม่มีข้อมูลเจ้าหน้าที่</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = officers.map(o => `
+                <tr>
+                    <td><strong>${o.name}</strong></td>
+                    <td>${o.rank}</td>
+                    <td>
+                        <span class="status-tag ${o.isOnDuty ? '' : 'off'}">
+                            ${o.isOnDuty ? 'ONLINE' : 'OFFLINE'}
+                        </span>
+                    </td>
+                    <td class="accumulated-time">${formatTime(o.totalSeconds)}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteOfficer(${o.id})">🗑️ ลบ</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        // Initialize
+        populateSelect();
+        renderTable();
     </script>
 </body>
 </html>
