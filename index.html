@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LNWZA STORY - ระบบบันทึกเวลาปฏิบัติงาน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --panel-bg: rgba(16, 23, 38, 0.75);
+            --panel-border: rgba(0, 180, 255, 0.25);
+            --primary-blue: #00d2ff;
+            --accent-cyan: #00f0ff;
+            --dark-blue: #0051ff;
+            --text-light: #e6f7ff;
+            --text-muted: #6b829e;
+            --danger: #ff4757;
+            --danger-hover: #ff6b81;
+            --success: #2ed573;
+            --glow: 0 0 20px rgba(0, 210, 255, 0.35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 81, 255, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                linear-gradient(to bottom, #050811, #0a0e17);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            padding: 18px 20px;
+            background: rgba(8, 12, 22, 0.9);
+            border-bottom: 1px solid var(--panel-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            padding: 6px 14px;
+            border-radius: 6px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary-blue);
+            background: rgba(0, 210, 255, 0.1);
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .header-title {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sub-header {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .main-header {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+
+        .time-today {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .time-today span {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-left: 5px;
+        }
+
+        .duty-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--glow);
+            margin-bottom: 35px;
+        }
+
+        .badge-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .badge-num {
+            background: var(--primary-blue);
+            color: #000;
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .status-off { color: var(--text-muted); }
+        .status-on { color: var(--success); text-shadow: 0 0 10px rgba(46, 213, 115, 0.5); }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-off { background: var(--text-muted); }
+        .dot-on { 
+            background: var(--success); 
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .stopwatch {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 4px;
+            margin: 10px 0 25px 0;
+            text-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
+        }
+
+        .btn-duty {
+            padding: 12px 35px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-on {
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+            border: 1px solid var(--accent-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+
+        .btn-on:hover {
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.7);
+            transform: translateY(-2px);
+        }
+
+        .btn-off {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-off:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .online-count {
+            background: rgba(0, 210, 255, 0.15);
+            border: 1px solid var(--primary-blue);
+            color: var(--accent-cyan);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .table-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 210, 255, 0.05);
+            padding: 14px 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.1);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        .status-tag {
+            background: rgba(46, 213, 115, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .accumulated-time {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-blue);
+            font-weight: 700;
+        }
+
+        .empty-table {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .user-info {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="nav-item">🏠 หน้าหลัก</a>
+        <a href="#" class="nav-item">⚖️ กฎระเบียบ</a>
+        <a href="#" class="nav-item active">⏱️ เข้าเวร</a>
+        <a href="#" class="nav-item">📋 ลงเคส</a>
+        <a href="#" class="nav-item">📊 สถิติ</a>
+    </nav>
+
+    <div class="container">
+        <div class="header-title">
+            <div class="brand-section">
+                <div>
+                    <div class="sub-header">LNWZA STORY</div>
+                    <div class="main-header">เข้าเวร</div>
+                </div>
+            </div>
+            <div class="time-today">
+                เวลางานวันนี้<br>
+                <span id="todayTotal">00:00</span> <small style="font-size: 0.7rem; color: var(--text-muted);">ชม.:นาที</small>
+            </div>
+        </div>
+
+        <div class="duty-card">
+            <div class="badge-step">
+                <span class="badge-num">01</span>
+                <span>สถานะของฉัน (<span class="user-info" id="currentUserName" onclick="changeName()">เจ้าหน้าที่ LNWZA</span>)</span>
+            </div>
+
+            <div class="status-indicator" id="statusIndicator">
+                <span class="dot dot-off"></span>
+                <span class="status-off">OFF DUTY</span>
+            </div>
+
+            <div class="stopwatch" id="display">00:00:00</div>
+
+            <button class="btn-duty btn-on" id="dutyBtn" onclick="toggleDuty()">
+                <span>⏱️</span> <span id="btnText">เข้าเวร / เริ่มงาน</span>
+            </button>
+        </div>
+
+        <div class="section-title">
+            <div class="badge-step" style="margin-bottom: 0;">
+                <span class="badge-num">02</span>
+                <span>เจ้าหน้าที่กำลังปฏิบัติงาน</span>
+            </div>
+            <span class="online-count" id="onlineBadge">0 ONLINE</span>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ชื่อเจ้าหน้าที่</th>
+                        <th>สถานะ</th>
+                        <th>เริ่มเข้าเวรเมื่อ</th>
+                        <th>ระยะเวลาสะสม</th>
+                    </tr>
+                </thead>
+                <tbody id="officerTableBody">
+                    <tr>
+                        <td colspan="4" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let timer = null;
+        let seconds = 0;
+        let isOnDuty = false;
+        let startTimeStr = "--:--:--";
+        let userName = localStorage.getItem("lnwza_username") || "เจ้าหน้าที่ LNWZA";
+
+        document.getElementById("currentUserName").innerText = userName;
+
+        function changeName() {
+            let newName = prompt("กรุณากรอกชื่อเจ้าหน้าที่ของคุณ:", userName);
+            if (newName && newName.trim() !== "") {
+                userName = newName.trim();
+                localStorage.setItem("lnwza_username", userName);
+                document.getElementById("currentUserName").innerText = userName;
+                if (isOnDuty) {
+                    renderTable();
+                }
+            }
+        }
+
+        function formatTime(totalSeconds) {
+            let hrs = Math.floor(totalSeconds / 3600);
+            let mins = Math.floor((totalSeconds % 3600) / 60);
+            let secs = totalSeconds % 60;
+
+            return (
+                (hrs < 10 ? "0" + hrs : hrs) + ":" +
+                (mins < 10 ? "0" + mins : mins) + ":" +
+                (secs < 10 ? "0" + secs : secs)
+            );
+        }
+
+        function toggleDuty() {
+            const btn = document.getElementById("dutyBtn");
+            const btnText = document.getElementById("btnText");
+            const statusIndicator = document.getElementById("statusIndicator");
+
+            if (!isOnDuty) {
+                isOnDuty = true;
+                const now = new Date();
+                startTimeStr = now.toTimeString().split(' ')[0] + " น.";
+                
+                btn.className = "btn-duty btn-off";
+                btnText.innerText = "จบเวร / เลิกงาน";
+                
+                statusIndicator.innerHTML = `
+                    <span class="dot dot-on"></span>
+                    <span class="status-on">ON DUTY</span>
+                `;
+
+                timer = setInterval(() => {
+                    seconds++;
+                    document.getElementById("display").innerText = formatTime(seconds);
+                    let mins = Math.floor(seconds / 60);
+                    let hrs = Math.floor(mins / 60);
+                    let displayMins = mins % 60;
+                    document.getElementById("todayTotal").innerText = 
+                        (hrs < 10 ? "0" + hrs : hrs) + ":" + (displayMins < 10 ? "0" + displayMins : displayMins);
+                    renderTable();
+                }, 1000);
+
+            } else {
+                isOnDuty = false;
+                clearInterval(timer);
+                seconds = 0;
+                document.getElementById("display").innerText = "00:00:00";
+                
+                btn.className = "btn-duty btn-on";
+                btnText.innerText = "เข้าเวร / เริ่มงาน";
+                
+                statusIndicator.innerHTML = `
+                    <span class="dot dot-off"></span>
+                    <span class="status-off">OFF DUTY</span>
+                `;
+            }
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("officerTableBody");
+            const badge = document.getElementById("onlineBadge");
+
+            if (isOnDuty) {
+                badge.innerText = "1 ONLINE";
+                tbody.innerHTML = `
+                    <tr>
+                        <td><strong>${userName}</strong></td>
+                        <td><span class="status-tag">ONLINE</span></td>
+                        <td>${startTimeStr}</td>
+                        <td class="accumulated-time">${formatTime(seconds)}</td>
+                    </tr>
+                `;
+            } else {
+                badge.innerText = "0 ONLINE";
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-table">ยังไม่มีเจ้าหน้าที่เข้าปฏิบัติงานในขณะนี้</td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
